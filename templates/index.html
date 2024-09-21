@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Light</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000000;
+        }
+        .light {
+            border-radius: 90%;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        #red { background-color: red; }
+        #yellow { background-color: yellow; }
+        #green { background-color: green; }
+    </style>
+</head>
+<body>
+
+    <div>
+        <div id="red" class="light" onclick="activate('red')"></div>
+        <div id="yellow" class="light" onclick="activate('yellow')"></div>
+        <div id="green" class="light" onclick="activate('green')"></div>
+    </div>
+
+    <script>
+        function activate(color) {
+            fetch(`/activate/${color}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelectorAll('.light').forEach(light => {
+                        light.style.opacity = '0.3';  // Dim all lights
+                    });
+                    if (data[color]) {
+                        document.getElementById(color).style.opacity = '1';  // Brighten the active light
+                    }
+                });
+        }
+
+    // New function to deactivate all lights
+    function deactivateAll() {
+        document.querySelectorAll('.light').forEach(light => {
+            light.style.opacity = '0.3';  // Dim all lights
+        });
+        fetch(`/activate/none`);  // Optionally, notify server if needed
+    }
+
+    // Event listener for clicks outside the buttons
+    document.body.addEventListener('click', function(event) {
+        const lights = document.querySelectorAll('.light');
+        const isLight = Array.from(lights).some(light => light.contains(event.target));
+
+        if (!isLight) {
+            deactivateAll();
+        }
+    });
+
+    </script>
+
+</body>
+</html>
